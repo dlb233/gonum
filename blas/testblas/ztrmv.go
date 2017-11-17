@@ -221,13 +221,22 @@ func ZtrmvTest(t *testing.T, impl Ztrmver) {
 	} {
 		n := len(test.x)
 		uplo := test.uplo
-		for _, diag := range []blas.Diag{blas.NonUnit, blas.Unit} {
-			for _, trans := range []blas.Transpose{blas.NoTrans, blas.Trans, blas.ConjTrans} {
-				if trans != blas.NoTrans {
-					continue
-				}
+		for _, trans := range []blas.Transpose{blas.NoTrans, blas.Trans, blas.ConjTrans} {
+			for _, diag := range []blas.Diag{blas.NonUnit, blas.Unit} {
 				for _, incX := range []int{-11, -2, -1, 1, 2, 7} {
 					for _, lda := range []int{max(1, n), n + 11} {
+						if trans == blas.ConjTrans {
+							continue
+						}
+						if trans == blas.Trans {
+							continue
+						}
+						if uplo == blas.Upper {
+							continue
+						}
+						if diag == blas.Unit {
+							continue
+						}
 						a := makeZGeneral(test.a, n, n, lda)
 						if diag == blas.Unit {
 							for i := 0; i < n; i++ {

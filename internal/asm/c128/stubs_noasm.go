@@ -6,7 +6,10 @@
 
 package c128
 
-import "math/cmplx"
+import (
+	"fmt"
+	"math/cmplx"
+)
 
 // AxpyUnitary is
 //  for i, v := range x {
@@ -155,6 +158,7 @@ func DotuUnitary(x, y []complex128) (sum complex128) {
 //  return sum
 func DotuInc(x, y []complex128, n, incX, incY, ix, iy uintptr) (sum complex128) {
 	for i := 0; i < int(n); i++ {
+		fmt.Println("n", n, "incX", incX, "incY", incY, "ix", ix, "iy", iy)
 		sum += y[iy] * x[ix]
 		ix += incX
 		iy += incY

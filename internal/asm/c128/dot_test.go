@@ -143,6 +143,7 @@ func TestDotuInc(t *testing.T) {
 	const gd, gdLn = 1 + 5i, 4
 	for i, test := range dotTests {
 		for _, inc := range newIncSet(1, 2, 5, 10, -1, -2, -5, -10) {
+			fmt.Println(inc)
 			prefix := fmt.Sprintf("Test %v (x:%v y:%v)", i, inc.x, inc.y)
 			xg, yg := guardIncVector(test.x, gd, inc.x, gdLn), guardIncVector(test.y, gd, inc.y, gdLn)
 			x, y := xg[gdLn:len(xg)-gdLn], yg[gdLn:len(yg)-gdLn]

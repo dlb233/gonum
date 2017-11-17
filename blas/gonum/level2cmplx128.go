@@ -585,24 +585,24 @@ func (Implementation) Ztrmv(uplo blas.Uplo, trans blas.Transpose, diag blas.Diag
 			if diag == blas.NonUnit {
 				if incX == 1 {
 					for i := 0; i < n; i++ {
-						x[i] = c128.DotuUnitary(a[i*lda:i*lda+n], x[i:n])
+						x[i] = c128.DotuUnitary(a[i*lda+i:i*lda+n], x[i:n])
 					}
 				} else {
 					ix := kx
 					for i := 0; i < n; i++ {
-						x[ix] = c128.DotuInc(a[i*lda:i*lda+n], x, uintptr(n-i), 1, uintptr(incX), 0, uintptr(ix))
+						x[ix] = c128.DotuInc(a[i*lda+i:i*lda+n], x, uintptr(n-i), 1, uintptr(incX), 0, uintptr(ix))
 						ix += incX
 					}
 				}
 			} else {
 				if incX == 1 {
 					for i := 0; i < n-1; i++ {
-						x[i] += c128.DotuUnitary(a[i*lda+1:i*lda+n], x[i+1:n])
+						x[i] += c128.DotuUnitary(a[i*lda+i+1:i*lda+n], x[i+1:n])
 					}
 				} else {
 					ix := kx
 					for i := 0; i < n-1; i++ {
-						x[ix] += c128.DotuInc(a[i*lda+1:i*lda+n], x, uintptr(n-i-1), 1, uintptr(incX), 0, uintptr(ix+incX))
+						x[ix] += c128.DotuInc(a[i*lda+i+1:i*lda+n], x, uintptr(n-i-1), 1, uintptr(incX), 0, uintptr(ix+incX))
 						ix += incX
 					}
 				}
@@ -616,7 +616,7 @@ func (Implementation) Ztrmv(uplo blas.Uplo, trans blas.Transpose, diag blas.Diag
 				} else {
 					ix := kx + (n-1)*incX
 					for i := n - 1; i >= 0; i-- {
-						x[ix] = c128.DotuInc(a[i*lda:i*lda+n], x, uintptr(n-i), 1, uintptr(incX), 0, uintptr(ix))
+						x[ix] = c128.DotuInc(a[i*lda:i*lda+i+1], x, uintptr(i+1), 1, uintptr(incX), 0, uintptr(kx))
 						ix -= incX
 					}
 				}
@@ -626,9 +626,9 @@ func (Implementation) Ztrmv(uplo blas.Uplo, trans blas.Transpose, diag blas.Diag
 						x[i] += c128.DotuUnitary(a[i*lda:i*lda+i], x[:i])
 					}
 				} else {
-					ix := kx + (n-2)*incX
+					ix := kx + (n-1)*incX
 					for i := n - 1; i >= 1; i-- {
-						x[ix] += c128.DotuInc(a[i*lda+1:i*lda+n], x, uintptr(n-i-1), 1, uintptr(incX), 0, uintptr(ix))
+						x[ix] += c128.DotuInc(a[i*lda:i*lda+i], x, uintptr(i), 1, uintptr(incX), 0, uintptr(kx))
 						ix -= incX
 					}
 				}
@@ -637,18 +637,25 @@ func (Implementation) Ztrmv(uplo blas.Uplo, trans blas.Transpose, diag blas.Diag
 		return
 	}
 
-	// Form x := A^T*x or x := A^H*x.
-	if uplo == blas.Upper {
-		if incX == 1 {
+	// Form x := A^T*x.
+	if trans == blas.Trans {
+		if uplo == blas.Upper {
+			if incX == 1 {
+				for i := n - 1; i >= 0; i-- {
+					c128.AxpyInc(x[i], a[i*lda+i:], x[i:n], uintptr(n-i), uintptr(lda), 1, 0, 0)
+				}
+			} else {
 
+			}
 		} else {
+			if incX == 1 {
 
+			} else {
+
+			}
 		}
-	} else {
-		if incX == 1 {
-
-		} else {
-
-		}
+		return
 	}
+
+	// Form x := A^H*x.
 }
